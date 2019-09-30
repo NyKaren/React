@@ -19,7 +19,7 @@ class App extends Component {
           dataType: 'json',
           success:function(resposta){
             this.setState({lista:resposta});
-          }.bind(this)
+          }.bind(this) //pegar o this do react e não do JSON
         });
     }
 
