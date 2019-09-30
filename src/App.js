@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { Component } from 'react';
 //import logo from './logo.svg';
 //import './App.css';
 import './css/pure-min.css';
 import './css/side-menu.css';
+import $ from 'jquery';
 
-function App() {
+//troquei function por class
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {lista : []};
+  }
+
+    componentWillMount() {
+        $.ajax({
+          //url:"http://localhost:8080/api/autores", teria que ter jdk7 pra conseguir rodar da minha máquina o .jar
+          url:"https://cdc-react.herokuapp.com/api/autores",
+          dataType: 'json',
+          success:function(resposta){
+            this.setState({lista:resposta});
+          }.bind(this)
+        });
+    }
+
+  render() {
   return (
     <div id="layout">
       {/*Menu toggle*/}
@@ -60,10 +79,14 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Alberto</td>                
-                      <td>alberto.souza@caelum.com.br</td>                
-                    </tr>
+                    {this.state.lista.map(function(autor){
+                      return(
+                        <tr>
+                          <td>{autor.nome}</td>                
+                          <td>{autor.email}</td>                
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table> 
               </div>             
@@ -71,6 +94,6 @@ function App() {
           </div>       
   </div>
   ); 
-}
+} }
 
 export default App;
