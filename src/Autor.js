@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import $ from 'jquery';
 import InputCustomizado from './InputCustomizado';
 
-export class FormularioAutor extends Component{
+class FormularioAutor extends Component{
+  
     constructor() {
         super();
-        this.state = {lista : [], nome:'',email:'',senha:''};
-        this.enviaForm = this.enviaForm.bind(this); //Pode ser assim tb
+        this.state = {nome:'',email:'',senha:''};
+        this.enviaForm = this.enviaForm.bind(this);
         this.setNome = this.setNome.bind(this);
         this.setEmail = this.setEmail.bind(this);
         this.setSenha = this.setSenha.bind(this);
@@ -14,16 +15,17 @@ export class FormularioAutor extends Component{
 
     enviaForm(evento) {
       evento.preventDefault();
+      console.log(this);
       $.ajax({
         url:"https://cdc-react.herokuapp.com/api/autores",
-        contentType: 'application/json',
+        contentType:'application/json',
         dataType:'json',
         type:'post',
-        data: JSON.stringify({nome:this.state.nome,email:this.state.email,senha:this.state.senha}),
+        data: JSON.stringify({nome: this.state.nome,email:this.state.email,senha:this.state.senha}),
         success: function(resposta){
-            this.setState({lista:resposta});
+            this.props.callbackAtualizaListagem(resposta);
         }.bind(this),
-        error: function(resposta){
+        erro: function(resposta){
             console.log("erro");
         }
       });
@@ -56,22 +58,11 @@ export class FormularioAutor extends Component{
         }
 }
 
-export class TabelaAutores extends Component {
+class TabelaAutores extends Component {
   
     constructor() {
       super();
       this.state = {lista : []};
-    }
-
-    componentDidMount() {
-        $.ajax({
-          //url:"http://localhost:8080/api/autores", teria que ter jdk7 pra conseguir rodar da minha máquina o .jar
-          url:"https://cdc-react.herokuapp.com/api/autores",
-          dataType: 'json',
-          success:function(resposta){
-            this.setState({lista:resposta});
-          }.bind(this) //pegar o this do react e não do JSON
-        });
     }
 
     render() {
@@ -85,17 +76,49 @@ export class TabelaAutores extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.state.lista.map(function(autor){
+                        {this.props.lista.map(function(autor){
                         return(
-                            <tr>
-                            <td>{autor.nome}</td>                
-                            <td>{autor.email}</td>                
+                            <tr key={autor.id}>
+                                <td>{autor.nome}</td>                
+                                <td>{autor.email}</td>                
                             </tr>
                         )
                         })}
                     </tbody>
                 </table> 
             </div>             
+        );
+    }
+}
+
+export default class AutorBox extends Component {
+  
+    constructor() {
+      super();
+      this.state = {lista : []};
+      this.atualizaListagem = this.atualizaListagem.bind(this);
+    }
+
+    componentDidMount() {
+        $.ajax({
+          url:"https://cdc-react.herokuapp.com/api/autores",
+          dataType: 'json',
+          success:function(resposta){
+            this.setState({lista:resposta});
+          }.bind(this)
+        });
+    }
+
+    atualizaListagem(novaLista) {
+        this.setState({lista:novaLista});
+    }
+
+    render() {
+        return(
+            <div>
+                <FormularioAutor callbackAtualizaListagem={this.atualizaListagem}/>
+                <TabelaAutores lista={this.state.lista}/>
+            </div>
         );
     }
 }
