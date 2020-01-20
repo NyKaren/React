@@ -17,7 +17,6 @@ class FormularioAutor extends Component{
 
     enviaForm(evento) {
       evento.preventDefault();
-      console.log(this);
       $.ajax({
         url:"https://cdc-react.herokuapp.com/api/autores",
         contentType:'application/json',
@@ -25,8 +24,8 @@ class FormularioAutor extends Component{
         type:'post',
         data: JSON.stringify({nome: this.state.nome,email:this.state.email,senha:this.state.senha}),
         success: function(novaListagem){
-            PubSub.publish('atualiza-lista-autores',novaListagem);
-        },
+            this.props.callbackAtualizaListagem(novaListagem);
+        }.bind(this),
         error: function(resposta){
             if(resposta.status === 400){
               new TratadorErros().publicaErros(resposta.responseJSON);
@@ -100,6 +99,7 @@ export default class AutorBox extends Component {
     constructor() {
       super();
       this.state = {lista : []};
+      this.atualizaListagem = this.atualizaListagem.bind(this);
     }
 
     componentDidMount() {
@@ -116,10 +116,14 @@ export default class AutorBox extends Component {
         }.bind(this));
     }
 
+    atualizaListagem(novaLista) {
+        this.setState({lista:novaLista});
+    }
+
     render() {
         return(
             <div>
-                <FormularioAutor />
+                <FormularioAutor callbackAtualizaListagem={this.atualizaListagem} />
                 <TabelaAutores lista={this.state.lista}/>
             </div>
         );
