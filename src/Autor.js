@@ -24,8 +24,8 @@ class FormularioAutor extends Component{
         type:'post',
         data: JSON.stringify({nome: this.state.nome,email:this.state.email,senha:this.state.senha}),
         success: function(novaListagem){
-            this.props.callbackAtualizaListagem(novaListagem);
-        }.bind(this),
+            PubSub.publish('atualiza-lista-autores', novaListagem);
+        },
         error: function(resposta){
             if(resposta.status === 400){
               new TratadorErros().publicaErros(resposta.responseJSON);
@@ -99,7 +99,6 @@ export default class AutorBox extends Component {
     constructor() {
       super();
       this.state = {lista : []};
-      this.atualizaListagem = this.atualizaListagem.bind(this);
     }
 
     componentDidMount() {
@@ -114,10 +113,6 @@ export default class AutorBox extends Component {
         PubSub.subscribe('atualiza-lista-autores', function(topico,novaLista){
             this.setState({lista:novaLista});
         }.bind(this));
-    }
-
-    atualizaListagem(novaLista) {
-        this.setState({lista:novaLista});
     }
 
     render() {
