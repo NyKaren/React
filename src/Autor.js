@@ -25,7 +25,8 @@ class FormularioAutor extends Component{
         data: JSON.stringify({nome: this.state.nome,email:this.state.email,senha:this.state.senha}),
         success: function(novaListagem){
             PubSub.publish('atualiza-lista-autores', novaListagem);
-        },
+            this.setState({nome:'', email:'', senha:''});
+        }.bind(this),
         error: function(resposta){
             if(resposta.status === 400){
               new TratadorErros().publicaErros(resposta.responseJSON);
