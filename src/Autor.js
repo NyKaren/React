@@ -29,9 +29,12 @@ class FormularioAutor extends Component{
         }.bind(this),
         error: function(resposta){
             if(resposta.status === 400){
-              new TratadorErros().publicaErros(resposta.responseJSON);
+                new TratadorErros().publicaErros(resposta.responseJSON);
             }
-          }
+        },
+        beforeSend: function() {
+            PubSub.publish("limpa-validacao", {});            
+        }
       });
     }
 

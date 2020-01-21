@@ -13,6 +13,10 @@ export default class InputCustomizado extends Component{
                 this.setState({msgErro:erro.defaultMessage});
             }
         }.bind(this));    
+        
+        PubSub.subscribe("limpa-validacao",function(topico){
+                this.setState({msgErro:''});
+        }.bind(this));    
     };
     
     render() {
